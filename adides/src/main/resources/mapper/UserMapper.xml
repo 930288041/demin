@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aieduc.dao.UserDao" >
+    <resultMap id="BaseResultMap" type="com.aieduc.entity.User" >
+        <id column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+        <result column="user_pwd" property="userPwd" jdbcType="VARCHAR" />
+        <result column="user_age" property="userAge" jdbcType="INTEGER" />
+        <result column="user_realname" property="userRealName" jdbcType="VARCHAR" />
+        <result column="user_userpic" property="userPic" jdbcType="VARCHAR" />
+        <result column="user_sex" property="userSex" jdbcType="INTEGER" />
+        <result column="user_intro" property="userIntro" jdbcType="VARCHAR" />
+        <result column="user_deptid" property="userDeptId" jdbcType="INTEGER" />
+        <result column="user_status" property="userStatus" jdbcType="INTEGER" />
+        <result column="user_cellphone" property="userCellPhone" jdbcType="VARCHAR" />
+        <result column="user_qq" property="userQQ" jdbcType="INTEGER" />
+        <association property="userDept" column="user_deptid" javaType="com.aieduc.entity.Dept">
+          	<id column="dept_id" property="deptId" /><!--根据sql查询出列，这里为了和t_user表的主键id区分，取了别名，如果不区分，结果会出错-->
+           	<result column="dept_name" property="deptName" />
+        </association>
+    </resultMap> 
+    <sql id="Base_Column_List" >
+        user_id, user_name, user_pwd, user_age 
+    </sql>
+     <sql id="User_Dept_Column_List" >
+        user_id, user_name, user_realname, user_pwd, user_age, dept_id, dept_name, user_sex
+    </sql>
+    <select id="findUserByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_user
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="findUserByUserName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from t_user
+        where user_name = #{userName,jdbcType=VARCHAR}
+    </select>
+    <select id="findUserPageList" resultMap="BaseResultMap" parameterType="com.aieduc.entity.User" >
+        select
+        <include refid="User_Dept_Column_List" />
+        from t_user u left join t_dept d on u.user_deptid=d.dept_id
+        where 1=1
+		<if test="userName != null and userName !='' ">
+			and user_name like concat('%', #{userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="userSex != null and userSex != 0">
+			and user_sex=#{userSex}
+		</if>
+        limit #{startRow}, #{pageSize}
+    </select>
+    <select id="findUserCounts" resultType="java.lang.Integer" parameterType="com.aieduc.entity.User" >
+        select
+        	count(*)
+        from t_user u left join t_dept d on u.user_deptid=d.dept_id
+        where 1=1
+		<if test="userName != null and userName !='' ">
+			and user_name like concat('%', #{userName,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="userSex != null and userSex != 0">
+			and user_sex=#{userSex}
+		</if>
+    </select>
+     <delete id="findDeleteByUser"  parameterType="java.lang.Integer" >
+        delete
+        from t_user
+        where user_id = #{userId,jdbcType=INTEGER}
+     </delete>
+    
+    
+</mapper>

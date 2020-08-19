@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aieduc.dao.DeptDao" >
+    <resultMap id="BaseResultMap" type="com.aieduc.entity.Dept" >
+        <id column="dept_id" property="deptId" jdbcType="INTEGER" />
+        <result column="dept_name" property="deptName" jdbcType="VARCHAR" />
+        <result column="dept_parentid" property="parentId" jdbcType="INTEGER" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        dept_id, dept_name, dept_parentid 
+    </sql>
+    <select id="findDeptByDeptId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from t_dept
+        where dept_id = #{deptId,jdbcType=INTEGER}
+    </select>
+    <select id="findDeptsByParentId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List" />
+        from t_dept
+        <if test="_parameter == 0">
+        	where dept_parentid is null
+        </if>
+        <if test="_parameter > 0">
+        	where dept_parentid = #{parentId,jdbcType=INTEGER}
+        </if>
+    </select>
+    <select id="findAllDeptList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_dept
+    </select>
+</mapper>
